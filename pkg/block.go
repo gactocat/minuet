@@ -11,11 +11,11 @@ const (
 func (b Block) String() string {
 	switch b {
 	case __:
-		return "＋"
+		return "⬛"
 	case NM:
-		return "⬜"
+		return "🟨"
 	case SP:
-		return "🔶"
+		return "🟧"
 	default:
 		return "Error"
 	}

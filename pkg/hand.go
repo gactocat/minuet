@@ -1,6 +1,7 @@
 package pkg
 
 type Hand struct {
-	Point Point
-    Card  Card
+	Pos    Pos
+	CardNo int
+	Dir    Dir
 }

@@ -2,23 +2,25 @@ package main
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/gactocat/minuet/pkg"
 )
 
 func main() {
+    t := time.Now()
 	result := map[int]map[int]pkg.Field{}
 
-	for i, c1 := range pkg.AllCards {
+	for i, c1 := range pkg.Cards {
 		f := pkg.CreateField(30, 30)
-		f, _ = f.Put(pkg.Point{X: 12, Y: 12}, c1)
-		for j := i + 1; j < len(pkg.AllCards); j++ {
-			c2 := pkg.AllCards[j]
+		f, _ = f.Put(pkg.Pos{X: 12, Y: 12}, c1)
+		for j := i + 1; j < len(pkg.Cards); j++ {
+			c2 := pkg.Cards[j]
 			for _, fp := range f.GetSidePoints() {
 				for _, d := range pkg.AllDir {
 					tc := c2.Turn(d)
 					for _, cp := range tc.GetFilledPoint() {
-						p := pkg.Point{X: fp.X - cp.X, Y: fp.Y - cp.Y}
+						p := pkg.Pos{X: fp.X - cp.X, Y: fp.Y - cp.Y}
 						f, err := f.Put(p, tc)
 						if err != nil {
 							continue
@@ -44,4 +46,5 @@ func main() {
 		}
 	}
 	fmt.Printf("Count: %v", len(result))
+    fmt.Printf("Time: %vs\n", time.Since(t).Seconds())
 }

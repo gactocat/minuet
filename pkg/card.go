@@ -1,9 +1,15 @@
 package pkg
 
+import (
+	"fmt"
+	"strings"
+)
+
 var (
-	AllCards = []Card{
+	Cards = []Card{
 		{
-			No: 1,
+			No:   1,
+			Name: "ﾋｰﾛｰｼｭｰﾀｰ",
 			Blocks: [][]Block{
 				{NM, NM, NM, NM, NM},
 				{NM, NM, NM, SP, NM},
@@ -12,7 +18,8 @@ var (
 			},
 		},
 		{
-			No: 2,
+			No:   2,
+			Name: "ﾎﾞｰﾙﾄﾞﾏｰｶｰ",
 			Blocks: [][]Block{
 				{NM, SP, __, NM},
 				{NM, NM, NM, NM},
@@ -20,14 +27,16 @@ var (
 			},
 		},
 		{
-			No: 3,
+			No:   3,
+			Name: "わかばｼｭｰﾀｰ",
 			Blocks: [][]Block{
 				{NM, SP, NM},
 				{NM, __, __},
 			},
 		},
 		{
-			No: 4,
+			No:   4,
+			Name: "ｼｬｰﾌﾟﾏｰｶｰ",
 			Blocks: [][]Block{
 				{__, __, NM, __},
 				{NM, NM, NM, SP},
@@ -35,7 +44,8 @@ var (
 			},
 		},
 		{
-			No: 5,
+			No:   5,
+			Name: "ﾌﾟﾛﾓﾃﾞﾗｰMG",
 			Blocks: [][]Block{
 				{NM, SP, __, __},
 				{NM, NM, NM, NM},
@@ -43,7 +53,8 @@ var (
 			},
 		},
 		{
-			No: 6,
+			No:   6,
+			Name: "ｽﾌﾟﾗｼｭｰﾀｰ",
 			Blocks: [][]Block{
 				{NM, NM, SP, __},
 				{NM, NM, NM, SP},
@@ -51,7 +62,8 @@ var (
 			},
 		},
 		{
-			No: 7,
+			No:   7,
+			Name: ".52ｶﾞﾛﾝ",
 			Blocks: [][]Block{
 				{NM, NM, NM, SP},
 				{__, NM, NM, __},
@@ -59,14 +71,16 @@ var (
 			},
 		},
 		{
-			No: 8,
+			No:   8,
+			Name: "",
 			Blocks: [][]Block{
 				{NM, NM, SP, NM},
 				{NM, __, __, __},
 			},
 		},
 		{
-			No: 9,
+			No:   9,
+			Name: "",
 			Blocks: [][]Block{
 				{__, __, __, NM, SP, __},
 				{NM, NM, NM, NM, NM, NM},
@@ -74,7 +88,8 @@ var (
 			},
 		},
 		{
-			No: 10,
+			No:   10,
+			Name: "",
 			Blocks: [][]Block{
 				{NM, NM, NM, NM, NM, SP},
 				{__, NM, NM, NM, __, __},
@@ -1459,8 +1474,8 @@ var (
 	}
 
 	NoCardMap = func() map[int]Card {
-		m := make(map[int]Card, len(AllCards))
-		for _, c := range AllCards {
+		m := make(map[int]Card, len(Cards))
+		for _, c := range Cards {
 			m[c.No] = c
 		}
 		return m
@@ -1469,6 +1484,7 @@ var (
 
 type Card struct {
 	No     int
+	Name   string
 	Blocks [][]Block
 }
 
@@ -1488,12 +1504,12 @@ func (p Card) Turn(d Dir) Card {
 	return dst
 }
 
-func (p Card) GetFilledPoint() []Point {
-	ret := []Point{}
+func (p Card) GetFilledPoint() []Pos {
+	ret := []Pos{}
 	for y, bb := range p.Blocks {
 		for x, b := range bb {
 			if b != __ {
-				ret = append(ret, Point{X: x, Y: y})
+				ret = append(ret, Pos{X: x, Y: y})
 			}
 		}
 	}
@@ -1516,12 +1532,21 @@ func (c Card) Height() int {
 }
 
 func (c Card) String() string {
-	var s string
-	for _, bb := range c.Blocks {
-		for _, b := range bb {
-			s = s + b.String()
+	b := strings.Builder{}
+	b.WriteString(fmt.Sprintf("No.%d\n", c.No))
+	b.WriteString(fmt.Sprintf("%s\n\n", c.Name))
+	offsetY := (8 - c.Height()) / 2
+	offsetX := (8 - c.Width()) / 2
+	for y := 0; y < 8; y++ {
+		for x := 0; x < 8; x++ {
+			if y < offsetY || y >= offsetY+c.Height() ||
+				x < offsetX || x >= offsetX+c.Width() {
+				b.WriteString(__.String())
+				continue
+			}
+			b.WriteString(c.Blocks[y-offsetY][x-offsetX].String())
 		}
-		s = s + "\n"
+		b.WriteRune('\n')
 	}
-	return s
+	return b.String()
 }

@@ -2,7 +2,7 @@ package pkg
 
 import (
 	"errors"
-	"fmt"
+	"strings"
 )
 
 var (
@@ -19,7 +19,7 @@ func CreateField(w int, h int) Field {
 	return ret
 }
 
-func (f Field) Put(p Point, c Card) (Field, error) {
+func (f Field) Put(p Pos, c Card) (Field, error) {
 	ret := f.Copy()
 	for y, bb := range c.Blocks {
 		for x, b := range bb {
@@ -37,8 +37,8 @@ func (f Field) Put(p Point, c Card) (Field, error) {
 	return ret, nil
 }
 
-func (f Field) GetSidePoints() []Point {
-	pp := map[Point]bool{}
+func (f Field) GetSidePoints() []Pos {
+	pp := map[Pos]bool{}
 	for y, bb := range f {
 		for x, b := range bb {
 			if b == __ {
@@ -48,14 +48,14 @@ func (f Field) GetSidePoints() []Point {
 			for offsetY := -1; offsetY <= +1; offsetY++ {
 				for offsetX := -1; offsetX <= +1; offsetX++ {
 					if f[y+offsetY][x+offsetX] == __ {
-						pp[Point{X: x + offsetX, Y: y + offsetY}] = true
+						pp[Pos{X: x + offsetX, Y: y + offsetY}] = true
 					}
 				}
 			}
 		}
 	}
 
-	ret := make([]Point, 0, len(pp))
+	ret := make([]Pos, 0, len(pp))
 	for p := range pp {
 		ret = append(ret, p)
 	}
@@ -109,16 +109,31 @@ func (f Field) Copy() Field {
 }
 
 func (f Field) String() string {
-	s := ""
-	for x := 0; x < f.Width(); x++ {
-		s += fmt.Sprintf("%2d", x)
-	}
-	s += "\n"
+	var minX, minY, maxX, maxY = 99, 99, 0, 0
 	for y, bb := range f {
-		for _, b := range bb {
-			s += b.String()
+		for x, b := range bb {
+			if b != __ {
+				if x < minX {
+					minX = x
+				}
+				if y < minY {
+					minY = y
+				}
+				if x > maxX {
+					maxX = x
+				}
+				if y > maxY {
+					maxY = y
+				}
+			}
 		}
-		s += fmt.Sprintf("%2d\n", y)
 	}
-	return s
+	b := strings.Builder{}
+	for y := minY; y <= maxY; y++ {
+		for x := minX; x <= maxX; x++ {
+			b.WriteString(f[y][x].String())
+		}
+		b.WriteRune('\n')
+	}
+	return b.String()
 }
